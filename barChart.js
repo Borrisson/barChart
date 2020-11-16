@@ -1,31 +1,30 @@
 const myCanvas = document.getElementById("myCanvas");
 myCanvas.width = 450;
 myCanvas.height = 450;
-  
 const ctx = myCanvas.getContext("2d");
 
 
-const myVinyls = {
-    "Classical music": 10,
-    "Alternative rock": 14,
-    "Pop": 2,
-    "Jazz": 12
+let myVinyls = {
+  "Classical music": 10,
+  "Alternative rock": 14,
+  "Pop": 2,
+  "Jazz": 12
 };
 
-function drawLine(ctx, startX, startY, endX, endY,color){
+function drawLine(ctx, startX, startY, endX, endY, color) {
   ctx.save();
   ctx.strokeStyle = color;
   ctx.beginPath();
-  ctx.moveTo(startX,startY);
-  ctx.lineTo(endX,endY);
+  ctx.moveTo(startX, startY);
+  ctx.lineTo(endX, endY);
   ctx.stroke();
   ctx.restore();
 }
 
-function drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height,color){
+function drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color) {
   ctx.save();
-  ctx.fillStyle=color;
-  ctx.fillRect(upperLeftCornerX,upperLeftCornerY,width,height);
+  ctx.fillStyle = color;
+  ctx.fillRect(upperLeftCornerX, upperLeftCornerY, width, height);
   ctx.restore();
 }
 
@@ -43,7 +42,6 @@ class Barchart {
       }
       let canvasActualHeight = this.canvas.height - this.options.padding * 2;
       let canvasActualWidth = this.canvas.width - this.options.padding * 2;
-
       //drawing the grid lines
       let gridValue = 0;
       while (gridValue <= maxValue) {
@@ -86,29 +84,24 @@ class Barchart {
 
         barIndex++;
       }
-      
+
       //drawing series name
       this.ctx.save();
-      this.ctx.textBaseline="bottom";
-      this.ctx.textAlign="center";
+      this.ctx.textBaseline = "bottom";
+      this.ctx.textAlign = "center";
       this.ctx.fillStyle = "#000000";
       this.ctx.font = "bold 14px Arial";
-      this.ctx.fillText(this.options.seriesName, this.canvas.width/2,this.canvas.height);
-      this.ctx.restore();  
+      this.ctx.fillText(this.options.seriesName, this.canvas.width / 2, this.canvas.height);
+      this.ctx.restore();
 
       //draw legend
       barIndex = 0;
       let legend = document.querySelector("legend[for='myCanvas']");
       let ul = document.createElement("ul");
       legend.append(ul);
-      for (let categ in this.options.data){
-          let li = document.createElement("li");
-          li.style.listStyle = "none";
-          li.style.borderLeft = "20px solid "+this.colors[barIndex%this.colors.length];
-          li.style.padding = "5px";
-          li.textContent = categ;
-          ul.append(li);
-          barIndex++;
+      for (let categ in this.options.data) {
+        ul.append(defaultListElement(barIndex, categ, this.colors));
+        barIndex++;
       }
     };
   }
@@ -116,77 +109,91 @@ class Barchart {
 
 let myBarchart = new Barchart(
   {
-      canvas:myCanvas,
-      seriesName:"Vinyl records",
-      padding:45,
-      gridScale:5,
-      gridColor:"#000000",
-      data:myVinyls,
-      colors:["#a55ca5","#67b6c7", "#bccd7a","#eb9743"]
+    canvas: myCanvas,
+    seriesName: "Vinyl records",
+    padding: 45,
+    gridScale: 5,
+    gridColor: "#000000",
+    data: myVinyls,
+    colors: ["#a55ca5", "#67b6c7", "#bccd7a", "#eb9743"]
   }
 );
 myBarchart.draw();
 
-//This is the list buttons that will "hopefully", be added to the barchart legend and then can be rendered onto the 
-//chart.
-var button = document.getElementById("enter");
-var input = document.getElementById("userinput");
-var ul = document.querySelector("ul");
-var list = document.getElementsByTagName("li");
-var deleteBtns = document.getElementsByClassName("delete");
+const button = document.getElementById("enter");
+const input = document.getElementById("userinput");
+const ul = document.querySelector("ul");
+const list = document.getElementsByTagName("li");
+const deleteBtns = document.getElementsByClassName("delete");
 
-function removeParent(evt) {
-  evt.target.removeEventListener("click", removeParent, false);
-  evt.target.parentNode.remove();
+function removeParent() {
+  this.removeEventListener("click", removeParent, false);
+  this.parentNode.remove();
 }
 
 /* This Function can also be written as 
-function liClick2(evt) {
-	evt.target.classList.toggle("done")
+function removeParent(evt) {
+  evt.target.removeEventListener("click", removeParent, false);
+  evt.target.parentNode.remove();
 } */
 
-//Essentially this = evt.target; What happens in liClick2 is the evt is given as parameter(so I clicked this specific text node). Then .target property says getElementByWhateverTriggeredThis.
+//Essentially this = evt.target; What happens in removeParent(evt) is the evt is given as parameter(so I clicked this specific text node). Then .target property says getElementByWhateverTriggeredThis.
 //Which is the textNode. this works the same. 
 
 
 function inputLength() {
-	return input.value.length;
+  return input.value.length;
+}
+
+
+function defaultListElement(index, input, color) {
+  let li = document.createElement("li");
+  let btns = document.createElement("button");
+  btns.className = 'delete';
+  btns.textContent = 'delete';
+  li.style.listStyle = "none";
+  li.style.borderLeft = "20px solid " + color[index % color.length];
+  li.style.padding = "5px";
+  li.textContent = input;
+  li.appendChild(btns);
+  return li;
 }
 
 function createListElement() {
-	var li = document.createElement("li");
-	var btns = document.createElement("button");
-	btns.textContent = 'delete';
-	btns.className = 'delete';
-	li.appendChild(document.createTextNode(input.value));
-	li.appendChild(btns);
-	ul.appendChild(li);
-	input.value = "";
+// /\d/.test checks wether or not there is a number in the string. No idea how it works will look into it further later. 
+// from stackoverflow "Check whether an input string contains a number in javascript."
+  if (input.value.indexOf(":") !== -1 && /\d/.test(input.value)) {
+    let splitStr = input.value.split(":");
+    myVinyls[splitStr[0].trim()] = Number(splitStr[1]);
+    input.value = "";
+    ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+    myBarchart.draw();
+    let legend = document.getElementById("legend");
+    legend.removeChild(legend.childNodes[0]);
+  } else {
+    alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
+  }
 }
-
 function addListAfterClick() {
-	if (inputLength() > 0) {
-		createListElement();
-		deleteBtns[deleteBtns.length-1].addEventListener("click", removeParent, false);
+  if (inputLength() > 0) {
+    createListElement();
+    deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
   }
 }
 
 
 function addListAfterKeypress(event) {
-	if (inputLength() > 0 && event.keyCode === 13) {
-		addListAfterClick();
-	}
+  if (inputLength() > 0 && event.keyCode === 13) {
+    addListAfterClick();
+  }
 }
 
 button.addEventListener("click", addListAfterClick);
 
 input.addEventListener("keypress", addListAfterKeypress);
 
-for(var i=0; i<list.length; i++){
- list[i].addEventListener("click", liClick);
-}
 //Same as other event listener events. The difference is the false argument, which takes a boolean value and is normally set to false. This field is optional and default value is false. 
 //This argument controls the flow of event firing, either bubling (from inside out) or capturing (from outside in). 
-for(var i = 0; i < deleteBtns.length; i++){
-	deleteBtns[i].addEventListener("click", removeParent, false);
+for (var i = 0; i < deleteBtns.length; i++) {
+  deleteBtns[i].addEventListener("click", removeParent, false);
 }
