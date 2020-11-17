@@ -1,10 +1,19 @@
+//Canvas variable declerations
 const myCanvas = document.getElementById("myCanvas");
 myCanvas.width = 450;
 myCanvas.height = 450;
 const ctx = myCanvas.getContext("2d");
 
+//legend button and input variables decleration.
+const userButton = document.getElementById("user-input-enter");
+const userInput = document.getElementById("user-input");
+const ul = document.querySelector("ul");
+const list = document.getElementsByTagName("li");
+const deleteBtns = document.getElementsByClassName("delete");
+const legendInputName = document.getElementById("legend-input");
+const legendButton = document.getElementById("legend-input-enter");
 
-let myVinyls = {
+let dataSet = {
   "Classical music": 10,
   "Alternative rock": 14,
   "Pop": 2,
@@ -101,6 +110,8 @@ class Barchart {
       legend.append(ul);
       for (let categ in this.options.data) {
         ul.append(defaultListElement(barIndex, categ, this.colors));
+        deleteBtns[barIndex].addEventListener("click", removeParent, false);
+        deleteBtns[barIndex].setAttribute("id", categ);
         barIndex++;
       }
     };
@@ -114,21 +125,19 @@ let myBarchart = new Barchart(
     padding: 45,
     gridScale: 5,
     gridColor: "#000000",
-    data: myVinyls,
+    data: dataSet,
     colors: ["#a55ca5", "#67b6c7", "#bccd7a", "#eb9743"]
   }
 );
 myBarchart.draw();
 
-const button = document.getElementById("enter");
-const input = document.getElementById("userinput");
-const ul = document.querySelector("ul");
-const list = document.getElementsByTagName("li");
-const deleteBtns = document.getElementsByClassName("delete");
 
 function removeParent() {
   this.removeEventListener("click", removeParent, false);
+  delete dataSet[this.id];
   this.parentNode.remove();
+  freshCanvas();
+  myBarchart.draw();
 }
 
 /* This Function can also be written as 
@@ -139,11 +148,6 @@ function removeParent(evt) {
 
 //Essentially this = evt.target; What happens in removeParent(evt) is the evt is given as parameter(so I clicked this specific text node). Then .target property says getElementByWhateverTriggeredThis.
 //Which is the textNode. this works the same. 
-
-
-function inputLength() {
-  return input.value.length;
-}
 
 
 function defaultListElement(index, input, color) {
@@ -159,41 +163,53 @@ function defaultListElement(index, input, color) {
   return li;
 }
 
+function freshCanvas() {
+  ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+    let legend = document.getElementById("legend");
+    legend.removeChild(legend.childNodes[0]);
+}
+
 function createListElement() {
 // /\d/.test checks wether or not there is a number in the string. No idea how it works will look into it further later. 
 // from stackoverflow "Check whether an input string contains a number in javascript."
-  if (input.value.indexOf(":") !== -1 && /\d/.test(input.value)) {
-    let splitStr = input.value.split(":");
-    myVinyls[splitStr[0].trim()] = Number(splitStr[1]);
-    input.value = "";
-    ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+  if (userInput.value.indexOf(":") !== -1 && /\d/.test(userInput.value)) {
+    let splitStr = userInput.value.split(":");
+    dataSet[splitStr[0].trim()] = Number(splitStr[1]);
+    userInput.value = "";
+    freshCanvas();
     myBarchart.draw();
-    let legend = document.getElementById("legend");
-    legend.removeChild(legend.childNodes[0]);
   } else {
     alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
   }
 }
-function addListAfterClick() {
-  if (inputLength() > 0) {
+
+userButton.addEventListener("click", () => {
+  if (userInput.value.length > 0) {
     createListElement();
     deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
+}});
+
+userInput.addEventListener("keypress", (event) => {
+  if (userInput.value.length > 0 && event.keyCode === 13) {
+    createListElement();
+    deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
+}});
+
+legendButton.addEventListener("click", () => { 
+  if(legendInputName.value.length > 0) {
+    myBarchart.options.seriesName = legendInputName.value;
+    freshCanvas();
+    myBarchart.draw();
+    legendInputName.value = "";
+}});
+
+legendInputName.addEventListener("keypress", (event) => {
+  if(legendInputName.value.length > 0 && event.keyCode === 13) {
+    myBarchart.options.seriesName = legendInputName.value;
+    freshCanvas();
+    myBarchart.draw();
+    legendInputName.value = "";
   }
-}
+});
 
 
-function addListAfterKeypress(event) {
-  if (inputLength() > 0 && event.keyCode === 13) {
-    addListAfterClick();
-  }
-}
-
-button.addEventListener("click", addListAfterClick);
-
-input.addEventListener("keypress", addListAfterKeypress);
-
-//Same as other event listener events. The difference is the false argument, which takes a boolean value and is normally set to false. This field is optional and default value is false. 
-//This argument controls the flow of event firing, either bubling (from inside out) or capturing (from outside in). 
-for (var i = 0; i < deleteBtns.length; i++) {
-  deleteBtns[i].addEventListener("click", removeParent, false);
-}
