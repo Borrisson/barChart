@@ -1,7 +1,7 @@
 //Canvas variable declerations
 const myCanvas = document.getElementById("myCanvas");
-myCanvas.width = 450;
-myCanvas.height = 450;
+myCanvas.width = 300;
+myCanvas.height = 300;
 const ctx = myCanvas.getContext("2d");
 
 //legend button and input variables decleration.
@@ -12,6 +12,8 @@ const list = document.getElementsByTagName("li");
 const deleteBtns = document.getElementsByClassName("delete");
 const legendInputName = document.getElementById("legend-input");
 const legendButton = document.getElementById("legend-input-enter");
+const genNew = document.getElementById("genNew");
+const slider = document.getElementById("slider");
 
 let dataSet = {
   "Classical music": 10,
@@ -51,10 +53,12 @@ class Barchart {
       }
       let canvasActualHeight = this.canvas.height - this.options.padding * 2;
       let canvasActualWidth = this.canvas.width - this.options.padding * 2;
+      slider.setAttribute("max", Math.ceil(Number(maxValue)/5)*5);
       //drawing the grid lines
       let gridValue = 0;
       while (gridValue <= maxValue) {
-        let gridY = canvasActualHeight * (1 - gridValue / maxValue) - this.options.padding;
+        let gridY = canvasActualHeight * (1 - gridValue / maxValue) + this.options.padding;
+        console.log(gridY, canvasActualHeight);
         drawLine(
           this.ctx,
           0,
@@ -67,6 +71,7 @@ class Barchart {
         //writing grid markers
         this.ctx.save();
         this.ctx.fillStyle = this.options.gridColor;
+        this.ctx.textBaseline="bottom"; 
         this.ctx.font = "bold 10px Arial";
         this.ctx.fillText(gridValue, 10, gridY - 2);
         this.ctx.restore();
@@ -122,13 +127,14 @@ let myBarchart = new Barchart(
   {
     canvas: myCanvas,
     seriesName: "Vinyl records",
-    padding: 45,
+    padding: 30,
     gridScale: 5,
     gridColor: "#000000",
     data: dataSet,
     colors: ["#a55ca5", "#67b6c7", "#bccd7a", "#eb9743"]
   }
 );
+
 myBarchart.draw();
 
 
@@ -212,4 +218,22 @@ legendInputName.addEventListener("keypress", (event) => {
   }
 });
 
+genNew.addEventListener("click", () => {
+  let colors = [];
+  for(let i = 0; i < 4; i++) {
+    let randomColor = "";
+    do {
+    randomColor = Math.floor(Math.random()*16777215).toString(16);
+  } while(randomColor.length < 6)
+  colors.push("#" + randomColor);
+  }
+  myBarchart.colors = colors;
+  freshCanvas();
+  myBarchart.draw();
+});
 
+slider.oninput = function() {
+  myBarchart.options.gridScale = Number(this.value);
+  freshCanvas();
+  myBarchart.draw();
+};

@@ -6,14 +6,18 @@
   <title>Bar Chart Project</title>
 </head>
 <body>
+
   <h1>
     <button id="genNew">Generate New Random Color</button>
     <span id="color"></span>
   </h1>
+  <div class="slidecontainer">
+    <input id="slider" type="range" min="5" max="250" value="5" class="slider" step="5" id="myRange"> <span>Grid Line range</span>
+  </div>
   <input id="user-input" type="text" placeholder="Enter [data : value] format.">
   <button id="user-input-enter">Enter</button>
   <input id="legend-input" type="text" placeholder="Enter legend Name">
-  <button id="legend-input-enter">Enter</button>
+  <button id="legend-input-enter">Enter </button>
   <canvas id="myCanvas">If you do not see any chart. Try enabling javascript from your broswer settings.</canvas>
   <legend id="legend"for="myCanvas"></legend>
   <script id="barChart" type="text/javascript" src="barChart.js".js"></script>
