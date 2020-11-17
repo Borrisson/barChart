@@ -3,29 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Chart</title>
+  <title>Bar Chart Project</title>
 </head>
 <body>
-  <header>
-   <h1 id="chart-title" class="chart">This is where your title will appear.</h1> 
-  </header>
-  <form>
-    <fieldset>
-      <legend>Enter your data</legend>
-      <label for="x-axis">Enter x-axis:</label>
-      <input placeholder="enter data" type="" id="x-axis" name="x-axis"><br><br>
-      <label for="y-axis">Enter y-axis</label>
-      <input type="text" id="y-axis" name="y-axis"><br><br>
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email"><br><br>
-      <label for="birthday">Birthday:</label>
-      <input type="date" id="birthday" name="birthday"><br><br>
-      <input type="submit" value="Submit">
-     </fieldset>
-  </form> 
-  
-  
-  
-  <script src="barChart.js"> </script>
+  <h1>
+    <button id="genNew">Generate New Random Color</button>
+    <span id="color"></span>
+  </h1>
+  <input id="user-input" type="text" placeholder="Enter [data : value] format.">
+  <button id="user-input-enter">Enter</button>
+  <input id="legend-input" type="text" placeholder="Enter legend Name">
+  <button id="legend-input-enter">Enter</button>
+  <canvas id="myCanvas">If you do not see any chart. Try enabling javascript from your broswer settings.</canvas>
+  <legend id="legend"for="myCanvas"></legend>
+  <script id="barChart" type="text/javascript" src="barChart.js".js"></script>
 </body>
 </html>
