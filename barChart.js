@@ -1,10 +1,10 @@
 //Canvas variable declerations
 const myCanvas = document.getElementById("myCanvas");
 myCanvas.width = 300;
-myCanvas.height = 300;
+myCanvas.height = 450;
 const ctx = myCanvas.getContext("2d");
 
-//legend button and input variables decleration.
+//legend, x and y axis, gridScale, color Randomizer, buttons, slider and input variables decleration.
 const userButton = document.getElementById("user-input-enter");
 const userInput = document.getElementById("user-input");
 const ul = document.querySelector("ul");
@@ -16,7 +16,7 @@ const valueInputName = document.getElementById("value-input");
 const valueButton = document.getElementById("value-input-enter");
 const genNew = document.getElementById("genNew");
 const slider = document.getElementById("slider");
-
+const dropDown = document.getElementById("bar-value-position");
 
 let dataSet = {
   "Classical music": 10,
@@ -24,6 +24,21 @@ let dataSet = {
   "Pop": 2,
   "Jazz": 12
 };
+
+function barValueCoord(height, upperY, barValuePosition) {
+  let coord = 0;
+  switch(barValuePosition) {
+    case "top": 
+      coord = upperY + 20;
+      break;
+    case "center": 
+      coord = (upperY + height) / 2;
+      break;
+    case "bottom":
+      coord = height - 40;
+  }
+  return coord;
+}
 
 function drawLine(ctx, startX, startY, endX, endY, color) {
   ctx.save();
@@ -35,10 +50,15 @@ function drawLine(ctx, startX, startY, endX, endY, color) {
   ctx.restore();
 }
 
-function drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color) {
+function drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color, value, posFunction, selectedPos)
+{
+  let txtWidth = ctx.measureText(value).width;
   ctx.save();
   ctx.fillStyle = color;
   ctx.fillRect(upperLeftCornerX, upperLeftCornerY, width, height);
+  ctx.fillStyle = "#000000";
+  ctx.font = "bold 10px Arial";
+  ctx.fillText(value, upperLeftCornerX + (width - txtWidth) / 2, posFunction(myCanvas.height, upperLeftCornerY, selectedPos));
   ctx.restore();
 }
 
@@ -56,8 +76,10 @@ class Barchart {
     }
     let canvasActualHeight = this.canvas.height - this.options.padding * 2;
     let canvasActualWidth = this.canvas.width - this.options.padding * 2;
+   
     //everytime the draw function is called it will draw to the next rounded up 5, using the slider scale.
     slider.setAttribute("max", Math.ceil(Number(maxValue) / 5) * 5);
+   
     //drawing the grid lines
 
     let gridValue = 0;
@@ -97,17 +119,21 @@ class Barchart {
         this.canvas.height - barHeight - this.options.padding,
         barSize,
         barHeight,
-        this.colors[barIndex % this.colors.length]
+        this.colors[barIndex % this.colors.length],
+        val,
+        barValueCoord,
+        this.options.barValPos
       );
-
       barIndex++;
     }
+
     //drawing value name
     this.ctx.save();
     this.ctx.font = "bold 14px Arial";
     this.ctx.fillStyle = "#000000";
     this.ctx.fillText(this.options.valueName, 2, 15);
     this.ctx.restore();
+    
     //drawing series name
     this.ctx.save();
     this.ctx.textBaseline = "bottom";
@@ -123,7 +149,11 @@ class Barchart {
     let ul = document.createElement("ul");
     legend.append(ul);
     for (let categ in this.options.data) {
-      ul.append(defaultListElement(barIndex, categ, this.colors));
+      let color = this.colors;
+      if(this.options.data[categ] === 0) {
+        color = "transparent";
+      };
+      ul.append(defaultListElement(barIndex, categ, color));
       deleteBtns[barIndex].addEventListener("click", removeParent, false);
       deleteBtns[barIndex].setAttribute("id", categ);
       barIndex++;
@@ -139,6 +169,7 @@ let myBarchart = new Barchart(
     padding: 30,
     gridScale: 5,
     gridColor: "#000000",
+    barValPos: "top",
     data: dataSet,
     colors: ["#a55ca5", "#67b6c7", "#bccd7a", "#eb9743"]
   }
@@ -171,7 +202,11 @@ function defaultListElement(index, input, color) {
   btns.className = 'delete';
   btns.textContent = 'delete';
   li.style.listStyle = "none";
-  li.style.borderLeft = "20px solid " + color[index % color.length];
+  if(color === "transparent") {
+    li.style.borderLeft = "20px solid " + color
+  } else {
+    li.style.borderLeft = "20px solid " + color[index % color.length];
+  }
   li.style.padding = "5px";
   li.textContent = input;
   li.appendChild(btns);
@@ -250,6 +285,7 @@ valueInputName.addEventListener("keypress", (event) => {
   }
 });
 
+//Color Randomzier
 genNew.addEventListener("click", () => {
   let colors = [];
   for (let i = 0; i < 4; i++) {
@@ -264,6 +300,13 @@ genNew.addEventListener("click", () => {
   myBarchart.draw();
 });
 
+dropDown.addEventListener("change" , () => {
+  myBarchart.options.barValPos = dropDown.value;
+  freshCanvas();
+  myBarchart.draw();
+});
+
+//gridScale slider
 slider.oninput = function () {
   myBarchart.options.gridScale = Number(this.value);
   freshCanvas();
