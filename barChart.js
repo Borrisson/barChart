@@ -25,6 +25,7 @@ let dataSet = {
   "Jazz": 12
 };
 
+//determines what the user has selected from the drop down menu. Either "top", "center", or "bottom".
 function barValueCoord(height, upperY, barValuePosition) {
   let coord = 0;
   switch(barValuePosition) {
@@ -222,12 +223,17 @@ function freshCanvas() {
 function createListElement() {
   // /\d/.test checks wether or not there is a number in the string. No idea how it works will look into it further later. 
   // from stackoverflow "Check whether an input string contains a number in javascript."
+  //next if checks wether the second string after ":", are digits otherwise it does nothing.
   if (userInput.value.indexOf(":") !== -1 && /\d/.test(userInput.value)) {
     let splitStr = userInput.value.split(":");
+    if(isNaN(splitStr[1])) { 
+      alert("Enter only valid numbers, do not add any characters other than numbers after ':'.");
+    } else {
     dataSet[splitStr[0].trim()] = Number(splitStr[1]);
     userInput.value = "";
     freshCanvas();
     myBarchart.draw();
+    }
   } else {
     alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
   }
@@ -300,6 +306,7 @@ genNew.addEventListener("click", () => {
   myBarchart.draw();
 });
 
+//dropDown changes position of the value within the bar of barChart
 dropDown.addEventListener("change" , () => {
   myBarchart.options.barValPos = dropDown.value;
   freshCanvas();
