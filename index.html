@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bar Chart Project</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+  <div id="bgColorSequence" class="container">
+    <div color-id="0" draggable="true" class="box"></div>
+    <div color-id="1" draggable="true" class="box"></div>
+    <div color-id="2" draggable="true" class="box"></div>
+    <div color-id="3" draggable="true" class="box"></div>
+  </div>
   <h1>
     <button id="genNew">Generate New Random Color</button>
     <span id="color"></span>
@@ -18,9 +24,9 @@
   <button id="user-input-enter">Enter</button>
   <br>
   <input id="legend-input" type="text" placeholder="Enter legend Name">
-  <button id="legend-input-enter">Enter </button>
+  <button id="legend-input-enter">Enter</button>
   <input id="value-input" type="text" placeholder="Enter value Name">
-  <button id="value-input-enter">Enter </button>
+  <button id="value-input-enter">Enter</button>
   <br>
   <label for="bar-Value">Choose the position of the value:</label>
 
@@ -33,6 +39,6 @@
 
   <canvas id="myCanvas">If you do not see any chart. Try enabling javascript from your broswer settings.</canvas>
     <legend id="legend"for="myCanvas"></legend>
-    <script id="barChart" type="text/javascript" src="barChart.js".js"></script>
+    <script id="barChart" type="text/javascript" src="barChart.js"></script>
 </body>
 </html>

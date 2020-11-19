@@ -28,11 +28,11 @@ let dataSet = {
 //determines what the user has selected from the drop down menu. Either "top", "center", or "bottom".
 function barValueCoord(height, upperY, barValuePosition) {
   let coord = 0;
-  switch(barValuePosition) {
-    case "top": 
+  switch (barValuePosition) {
+    case "top":
       coord = upperY + 20;
       break;
-    case "center": 
+    case "center":
       coord = (upperY + height) / 2;
       break;
     case "bottom":
@@ -51,8 +51,7 @@ function drawLine(ctx, startX, startY, endX, endY, color) {
   ctx.restore();
 }
 
-function drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color, value, posFunction, selectedPos)
-{
+function drawBar(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color, value, posFunction, selectedPos) {
   let txtWidth = ctx.measureText(value).width;
   ctx.save();
   ctx.fillStyle = color;
@@ -77,10 +76,10 @@ class Barchart {
     }
     let canvasActualHeight = this.canvas.height - this.options.padding * 2;
     let canvasActualWidth = this.canvas.width - this.options.padding * 2;
-   
+
     //everytime the draw function is called it will draw to the next rounded up 5, using the slider scale.
     slider.setAttribute("max", Math.ceil(Number(maxValue) / 5) * 5);
-   
+
     //drawing the grid lines
 
     let gridValue = 0;
@@ -110,7 +109,7 @@ class Barchart {
     let barIndex = 0;
     let numberOfBars = Object.keys(this.options.data).length;
     let barSize = (canvasActualWidth) / numberOfBars;
-
+    console.log(this.colors);
     for (let categ in this.options.data) {
       let val = this.options.data[categ];
       let barHeight = Math.round(canvasActualHeight * val / maxValue);
@@ -134,7 +133,7 @@ class Barchart {
     this.ctx.fillStyle = "#000000";
     this.ctx.fillText(this.options.valueName, 2, 15);
     this.ctx.restore();
-    
+
     //drawing series name
     this.ctx.save();
     this.ctx.textBaseline = "bottom";
@@ -151,7 +150,7 @@ class Barchart {
     legend.append(ul);
     for (let categ in this.options.data) {
       let color = this.colors;
-      if(this.options.data[categ] === 0) {
+      if (this.options.data[categ] === 0) {
         color = "transparent";
       };
       ul.append(defaultListElement(barIndex, categ, color));
@@ -159,6 +158,7 @@ class Barchart {
       deleteBtns[barIndex].setAttribute("id", categ);
       barIndex++;
     }
+    console.log('drawn');
   };
 }
 
@@ -172,7 +172,7 @@ let myBarchart = new Barchart(
     gridColor: "#000000",
     barValPos: "top",
     data: dataSet,
-    colors: ["#a55ca5", "#67b6c7", "#bccd7a", "#eb9743"]
+    colors: ["#a55ca5", "#67b6c7", "#bccd7a", "#eb9743", "#000000"]
   }
 );
 
@@ -203,7 +203,7 @@ function defaultListElement(index, input, color) {
   btns.className = 'delete';
   btns.textContent = 'delete';
   li.style.listStyle = "none";
-  if(color === "transparent") {
+  if (color === "transparent") {
     li.style.borderLeft = "20px solid " + color
   } else {
     li.style.borderLeft = "20px solid " + color[index % color.length];
@@ -226,18 +226,42 @@ function createListElement() {
   //next if checks wether the second string after ":", are digits otherwise it does nothing.
   if (userInput.value.indexOf(":") !== -1 && /\d/.test(userInput.value)) {
     let splitStr = userInput.value.split(":");
-    if(isNaN(splitStr[1])) { 
+    if (isNaN(splitStr[1])) {
       alert("Enter only valid numbers, do not add any characters other than numbers after ':'.");
     } else {
-    dataSet[splitStr[0].trim()] = Number(splitStr[1]);
-    userInput.value = "";
-    freshCanvas();
-    myBarchart.draw();
+      dataSet[splitStr[0].trim()] = Number(splitStr[1]);
+      userInput.value = "";
+      freshCanvas();
+      myBarchart.draw();
     }
   } else {
     alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
   }
 }
+
+
+function makeColorBox() {
+  const divContainer = document.querySelector("div[class='container']");
+  for (let i = 0; i < myBarchart.colors.length; i++) {
+    if (divContainer.childElementCount < myBarchart.colors.length) {
+      let diff = myBarchart.colors.length - divContainer.childElementCount;
+      while (diff > 0) {
+        let index = myBarchart.colors.length - diff;
+        let div = document.createElement('div');
+        div.setAttribute("color-id", index);
+        div.setAttribute('draggable', "true");
+        div.setAttribute("class", "box");
+        divContainer.appendChild(div);
+        diff--;
+      }
+    }
+    divContainer.children[i].style.backgroundColor = myBarchart.colors[i];
+  }
+}
+
+makeColorBox();
+
+
 //User input Data
 userButton.addEventListener("click", () => {
   if (userInput.value.length > 0) {
@@ -264,7 +288,7 @@ legendButton.addEventListener("click", () => {
 });
 
 legendInputName.addEventListener("keypress", (event) => {
-  if (legendInputName.value.length > 0 && event.keyCode === 13 ) {
+  if (legendInputName.value.length > 0 && event.keyCode === 13) {
     myBarchart.options.seriesName = legendInputName.value;
     freshCanvas();
     myBarchart.draw();
@@ -294,7 +318,7 @@ valueInputName.addEventListener("keypress", (event) => {
 //Color Randomzier
 genNew.addEventListener("click", () => {
   let colors = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < myBarchart.colors.length; i++) {
     let randomColor = "";
     do {
       randomColor = Math.floor(Math.random() * 16777215).toString(16);
@@ -302,12 +326,13 @@ genNew.addEventListener("click", () => {
     colors.push("#" + randomColor);
   }
   myBarchart.colors = colors;
+  makeColorBox();
   freshCanvas();
   myBarchart.draw();
 });
 
 //dropDown changes position of the value within the bar of barChart
-dropDown.addEventListener("change" , () => {
+dropDown.addEventListener("change", () => {
   myBarchart.options.barValPos = dropDown.value;
   freshCanvas();
   myBarchart.draw();
@@ -319,3 +344,87 @@ slider.oninput = function () {
   freshCanvas();
   myBarchart.draw();
 };
+
+//Drag and Drop items (working progress) functionality of drag and drop works. Trying to associate colors to boxes now.
+document.addEventListener('DOMContentLoaded', (event) => {
+
+  var dragSrcEl = null;
+
+  function handleDragStart(e) {
+    this.style.opacity = '0.4';
+
+    dragSrcEl = this;
+
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+
+  }
+
+  function handleDragOver(e) {
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+
+    e.dataTransfer.dropEffect = 'move';
+
+    return false;
+  }
+
+  function handleDragEnter(e) {
+    this.classList.add('over');
+  }
+
+  function handleDragLeave(e) {
+    this.classList.remove('over');
+  }
+
+  function handleDrop(e) {
+    if (e.stopPropagation) {
+      e.stopPropagation(); // stops the browser from redirecting.
+    }
+
+    if (dragSrcEl != this) {
+      dragSrcEl.innerHTML = this.innerHTML;
+      this.innerHTML = e.dataTransfer.getData('text/html');
+
+      idToReplace = this.attributes["color-id"].value;
+      draggedId = dragSrcEl.attributes["color-id"].value;
+      bgColorToReplace = this.attributes['style'].value ;
+      draggedBgColor = dragSrcEl.attributes['style'].value;
+      draggedBgColor = draggedBgColor.replace("opacity: 0.4", "");
+
+      this.setAttribute("style", draggedBgColor);
+      dragSrcEl.setAttribute("style", bgColorToReplace);
+
+      let colorList = myBarchart.colors;
+      let b = colorList[idToReplace];
+      colorList[idToReplace] = colorList[draggedId];
+      colorList[draggedId] = b;
+      
+      freshCanvas();
+      myBarchart.draw();
+    }
+
+    return false;
+  }
+
+  function handleDragEnd(e) {
+    this.style.opacity = '1';
+
+    items.forEach(function (item) {
+      item.classList.remove('over');
+    });
+  }
+
+
+  let items = document.querySelectorAll('.container .box');
+  items.forEach(function (item) {
+    item.addEventListener('dragstart', handleDragStart, false);
+    item.addEventListener('dragenter', handleDragEnter, false);
+    item.addEventListener('dragover', handleDragOver, false);
+    item.addEventListener('dragleave', handleDragLeave, false);
+    item.addEventListener('drop', handleDrop, false);
+    item.addEventListener('dragend', handleDragEnd, false);
+  });
+
+});
