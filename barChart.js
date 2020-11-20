@@ -237,32 +237,35 @@ function createListElement() {
   }
 }
 
-
 function makeColorBox() {
   const divContainer = document.querySelector("div[class='container']");
-  for (let i = 0; i < myBarchart.colors.length; i++) {
+  for (let i = 0; i < divContainer.childElementCount; i++) {
     if (divContainer.childElementCount < myBarchart.colors.length) {
-      let diff = myBarchart.colors.length - divContainer.childElementCount;
+      let diff =  myBarchart.colors.length - divContainer.childElementCount;
       while (diff > 0) {
         let index = myBarchart.colors.length - diff;
         let div = document.createElement('div');
         div.setAttribute("color-id", index);
         div.setAttribute('draggable', "true");
-        div.setAttribute("class", "box");
+        div.setAttribute("class", "box color-picker-binded");
         divContainer.appendChild(div);
         diff--;
+        PICKER.bind_input(index);
       }
     }
     divContainer.children[i].style.backgroundColor = myBarchart.colors[i];
   }
+  dragAndDrop();
 }
 
-makeColorBox();
 
 
 //User input Data
 userButton.addEventListener("click", () => {
   if (userInput.value.length > 0) {
+    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    myBarchart.colors.push(randomColor);
+    makeColorBox();
     createListElement();
     deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
   }
@@ -270,6 +273,9 @@ userButton.addEventListener("click", () => {
 
 userInput.addEventListener("keypress", (event) => {
   if (userInput.value.length > 0 && event.keyCode === 13) {
+    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    myBarchart.colors.push(randomColor);
+    makeColorBox();
     createListElement();
     deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
   }
@@ -344,56 +350,56 @@ slider.oninput = function () {
 };
 
 //Drag and Drop items (working progress) functionality of drag and drop works. Trying to associate colors to boxes now.
-document.addEventListener('DOMContentLoaded', (event) => {
-
+let dragAndDrop = (event) => {
+  
   var dragSrcEl = null;
-
+  
   function handleDragStart(e) {
     this.style.opacity = '0.4';
-
+    
     dragSrcEl = this;
-
+    
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', this.innerHTML);
-
+    
   }
-
+  
   function handleDragOver(e) {
     if (e.preventDefault) {
       e.preventDefault();
     }
-
+    
     e.dataTransfer.dropEffect = 'move';
-
+    
     return false;
   }
-
+  
   function handleDragEnter(e) {
     this.classList.add('over');
   }
-
+  
   function handleDragLeave(e) {
     this.classList.remove('over');
   }
-
+  
   function handleDrop(e) {
     if (e.stopPropagation) {
       e.stopPropagation(); // stops the browser from redirecting.
     }
-
+    
     if (dragSrcEl != this) {
       dragSrcEl.innerHTML = this.innerHTML;
       this.innerHTML = e.dataTransfer.getData('text/html');
-
+      
       idToReplace = this.attributes["color-id"].value;
       draggedId = dragSrcEl.attributes["color-id"].value;
       bgColorToReplace = this.attributes['style'].value ;
       draggedBgColor = dragSrcEl.attributes['style'].value;
       draggedBgColor = draggedBgColor.replace("opacity: 0.4", "");
-
+      
       this.setAttribute("style", draggedBgColor);
       dragSrcEl.setAttribute("style", bgColorToReplace);
-
+      
       let colorList = myBarchart.colors;
       let b = colorList[idToReplace];
       colorList[idToReplace] = colorList[draggedId];
@@ -402,19 +408,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
       freshCanvas();
       myBarchart.draw();
     }
-
+    
     return false;
   }
-
+  
   function handleDragEnd(e) {
     this.style.opacity = '1';
-
+    
     items.forEach(function (item) {
       item.classList.remove('over');
     });
   }
-
-
+  
+  
   let items = document.querySelectorAll('.container .box');
   items.forEach(function (item) {
     item.addEventListener('dragstart', handleDragStart, false);
@@ -424,99 +430,105 @@ document.addEventListener('DOMContentLoaded', (event) => {
     item.addEventListener('drop', handleDrop, false);
     item.addEventListener('dragend', handleDragEnd, false);
   });
+  
+};
 
-});
 
 PICKER = {
   mouse_inside: false,
-
+  
   to_hex: function (dec) {
-      hex = dec.toString(16);
-      return hex.length == 2 ? hex : '0' + hex;
+    hex = dec.toString(16);
+    return hex.length == 2 ? hex : '0' + hex;
   },
-
+  
   show: function () {
-      var input = $(this);
-      var position = input.offset();
-
-      PICKER.$colors  = $('<canvas width="230" height="150" ></canvas>');
-      PICKER.$colors.css({
-          'position': 'absolute',
-          'top': position.top + input.height() + 9,
-          'left': position.left,
-          'cursor': 'crosshair',
-          'display': 'none'
-      });
-      $('body').append(PICKER.$colors.fadeIn());
-      PICKER.colorctx = PICKER.$colors[0].getContext('2d');
-
-      PICKER.render();
-
-      PICKER.$colors
-          .click(function (e) {
-              var new_color = PICKER.get_color(e);
-              $(input).css({'background-color': new_color}).val(new_color).trigger('change').removeClass('color-picker-binded');
-              PICKER.close();
-              var x = $(input).index();
-              myBarchart.colors[x] = new_color;
-              freshCanvas();
-              myBarchart.draw();
-          })
-          .hover(function () {
-              PICKER.mouse_inside=true;
-          }, function () {
-              PICKER.mouse_inside=false;
-          });
-
-      $("body").mouseup(function () {
-          if (!PICKER.mouse_is_inside) PICKER.close();
-      });
+    let input = $(this);
+    let position = input.offset();
+    
+    PICKER.$colors  = $('<canvas width="230" height="150" ></canvas>');
+    PICKER.$colors.css({
+      'position': 'absolute',
+      'top': position.top + input.height() + 9,
+      'left': position.left,
+      'cursor': 'crosshair',
+      'display': 'none'
+    });
+    $('body').append(PICKER.$colors.fadeIn());
+    PICKER.colorctx = PICKER.$colors[0].getContext('2d');
+    
+    PICKER.render();
+    
+    PICKER.$colors
+    .click(function (e) {
+      let new_color = PICKER.get_color(e);
+      $(input).css({'background-color': new_color}).val(new_color).trigger('change').removeClass('color-picker-binded');
+      PICKER.close();
+      let i = $(input).index();
+      myBarchart.colors[i] = new_color;
+      freshCanvas();
+      myBarchart.draw();
+    })
+    .hover(function () {
+      PICKER.mouse_inside=true;
+    }, function () {
+      PICKER.mouse_inside=false;
+    });
+    
+    $("body").mouseup(function () {
+      if (!PICKER.mouse_is_inside) PICKER.close();
+    });
   },
-
+  
   bind_inputs: function () {
-      $('div[draggable="true"]').each(function () {
-          $(this).click(PICKER.show);
-      }).addClass('color-picker-binded');
+    $('div[draggable="true"]').each(function () {
+      $(this).click(PICKER.show);
+    }).addClass('color-picker-binded');
   },
-
+  
+  bind_input: function(index) {
+    $('div[draggable="true"]').eq(index).click(PICKER.show);
+  },
+  
   close: function () {PICKER.$colors.fadeOut(PICKER.$colors.remove);},
-
+  
   get_color: function (e) {
-      var pos_x = e.pageX - PICKER.$colors.offset().left;
-      var pos_y = e.pageY - PICKER.$colors.offset().top;
-
-      data = PICKER.colorctx.getImageData(pos_x, pos_y, 1, 1).data;
-      return '#' + PICKER.to_hex(data[0]) + PICKER.to_hex(data[1]) + PICKER.to_hex(data[2]);
+    let pos_x = e.pageX - PICKER.$colors.offset().left;
+    let pos_y = e.pageY - PICKER.$colors.offset().top;
+    
+    data = PICKER.colorctx.getImageData(pos_x, pos_y, 1, 1).data;
+    return '#' + PICKER.to_hex(data[0]) + PICKER.to_hex(data[1]) + PICKER.to_hex(data[2]);
   },
-
-// Build Color palette
+  
+  // Build Color palette
   render: function () {
-      var gradient = PICKER.colorctx.createLinearGradient(0, 0, PICKER.$colors.width(), 0);
-
-      // Create color gradient
-      gradient.addColorStop(0,    "rgb(255,   0,   0)");
-      gradient.addColorStop(0.15, "rgb(255,   0, 255)");
-      gradient.addColorStop(0.33, "rgb(0,     0, 255)");
-      gradient.addColorStop(0.49, "rgb(0,   255, 255)");
-      gradient.addColorStop(0.67, "rgb(0,   255,   0)");
-      gradient.addColorStop(0.84, "rgb(255, 255,   0)");
-      gradient.addColorStop(1,    "rgb(255,   0,   0)");
-
-      // Apply gradient to canvas
-      PICKER.colorctx.fillStyle = gradient;
-      PICKER.colorctx.fillRect(0, 0, PICKER.colorctx.canvas.width, PICKER.colorctx.canvas.height);
-
-      // Create semi transparent gradient (white -> trans. -> black)
-      gradient = PICKER.colorctx.createLinearGradient(0, 0, 0, PICKER.$colors.height());
-      gradient.addColorStop(0,   "rgba(255, 255, 255, 1)");
-      gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
-      gradient.addColorStop(0.5, "rgba(0,     0,   0, 0)");
-      gradient.addColorStop(1,   "rgba(0,     0,   0, 1)");
-
-      // Apply gradient to canvas
-      PICKER.colorctx.fillStyle = gradient;
-      PICKER.colorctx.fillRect(0, 0, PICKER.colorctx.canvas.width, PICKER.colorctx.canvas.height);
+    let gradient = PICKER.colorctx.createLinearGradient(0, 0, PICKER.$colors.width(), 0);
+    
+    // Create color gradient
+    gradient.addColorStop(0,    "rgb(255,   0,   0)");
+    gradient.addColorStop(0.15, "rgb(255,   0, 255)");
+    gradient.addColorStop(0.33, "rgb(0,     0, 255)");
+    gradient.addColorStop(0.49, "rgb(0,   255, 255)");
+    gradient.addColorStop(0.67, "rgb(0,   255,   0)");
+    gradient.addColorStop(0.84, "rgb(255, 255,   0)");
+    gradient.addColorStop(1,    "rgb(255,   0,   0)");
+    
+    // Apply gradient to canvas
+    PICKER.colorctx.fillStyle = gradient;
+    PICKER.colorctx.fillRect(0, 0, PICKER.colorctx.canvas.width, PICKER.colorctx.canvas.height);
+    
+    // Create semi transparent gradient (white -> trans. -> black)
+    gradient = PICKER.colorctx.createLinearGradient(0, 0, 0, PICKER.$colors.height());
+    gradient.addColorStop(0,   "rgba(255, 255, 255, 1)");
+    gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
+    gradient.addColorStop(0.5, "rgba(0,     0,   0, 0)");
+    gradient.addColorStop(1,   "rgba(0,     0,   0, 1)");
+    
+    // Apply gradient to canvas
+    PICKER.colorctx.fillStyle = gradient;
+    PICKER.colorctx.fillRect(0, 0, PICKER.colorctx.canvas.width, PICKER.colorctx.canvas.height);
   }
 };
 
 PICKER.bind_inputs();
+makeColorBox();
