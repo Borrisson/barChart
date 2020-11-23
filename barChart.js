@@ -179,7 +179,10 @@ myBarchart.draw();
 
 function removeParent() {
   this.removeEventListener("click", removeParent, false);
+  const index = Object.keys(dataSet).indexOf(this.id);
+  $('div[draggable="true"').eq(index).remove();
   delete dataSet[this.id];
+  myBarchart.colors.splice(index, 1);
   this.parentNode.remove();
   freshCanvas();
   myBarchart.draw();
@@ -202,7 +205,7 @@ function defaultListElement(index, input, color) {
   btns.textContent = 'delete';
   li.style.listStyle = "none";
   if (color === "transparent") {
-    li.style.borderLeft = "20px solid " + color
+    li.style.borderLeft = "20px solid " + color;
   } else {
     li.style.borderLeft = "20px solid " + color[index % color.length];
   }
@@ -263,7 +266,7 @@ function makeColorBox() {
 //User input Data
 userButton.addEventListener("click", () => {
   if (userInput.value.length > 0) {
-    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
     myBarchart.colors.push(randomColor);
     makeColorBox();
     createListElement();
@@ -273,7 +276,7 @@ userButton.addEventListener("click", () => {
 
 userInput.addEventListener("keypress", (event) => {
   if (userInput.value.length > 0 && event.keyCode === 13) {
-    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
     myBarchart.colors.push(randomColor);
     makeColorBox();
     createListElement();
