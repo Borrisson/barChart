@@ -220,15 +220,15 @@ function freshCanvas() {
   let legend = document.getElementById("legend");
   legend.removeChild(legend.childNodes[0]);
 }
-class ListElementError extends Error { };
+
+class ListElementError extends Error {};
 
 
 function createListElement() {
   // /\d/.test checks wether or not there is a number in the string. It is a regular expression. between the two
   // forward slashes "//". \d is a type of expression, whereas .test() is a method. It is the same meaning as 
   // /[0-9]/.test(). It says check if there are any digits at all within this string. It will return a boolean. 
-  // next if checks wether the second string after ":", are digits otherwise it does nothing. List of other
-  // expressions can be found pg 147 of eloquent Javascript.
+  //  List of other expressions can be found pg 147 of eloquent Javascript.
   if (/.+:\s*\d/.test(userInput.value)) {
     let splitStr = userInput.value.split(":");
     dataSet[splitStr[0].trim()] = Number(splitStr[1]);
@@ -261,11 +261,11 @@ function makeColorBox() {
   }
   dragAndDrop();
 }
-function inputLength() {
-  return userInput.value.length;
+function elementLength(targetedElement) {
+  return targetedElement.value.length;
 }
 function addNewElement() {
-  if (inputLength() > 0) {
+  if (elementLength(userInput) > 0) {
     let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
     myBarchart.colors.push(randomColor);
     try {
@@ -282,50 +282,48 @@ function addNewElement() {
   }
 }
 
+function legendNameChg() {
+  if (elementLength(legendInputName) > 0) {
+    myBarchart.options.seriesName = legendInputName.value;
+    freshCanvas();
+    myBarchart.draw();
+    legendInputName.value = "";
+  }
+}
+
+function valueNameChg() {
+  if (elementLength(valueInputName) > 0) {
+    myBarchart.options.valueName = valueInputName.value;
+    freshCanvas();
+    myBarchart.draw();
+    valueInputName.value = "";
+  }
+}
+
 //User input Data
 userButton.addEventListener("click", addNewElement);
 
 userInput.addEventListener("keypress", (event) => {
-  if (inputLength() > 0 && event.keyCode === 13) {
+  if (elementLength(userInput) > 0 && event.keyCode === 13) {
     addNewElement();
   }
 });
 
 //User legend Name Change
-legendButton.addEventListener("click", () => {
-  if (legendInputName.value.length > 0) {
-    myBarchart.options.seriesName = legendInputName.value;
-    freshCanvas();
-    myBarchart.draw();
-    legendInputName.value = "";
-  }
-});
+legendButton.addEventListener("click", legendNameChg);
 
 legendInputName.addEventListener("keypress", (event) => {
-  if (legendInputName.value.length > 0 && event.keyCode === 13) {
-    myBarchart.options.seriesName = legendInputName.value;
-    freshCanvas();
-    myBarchart.draw();
-    legendInputName.value = "";
+  if (elementLength(legendInputName) > 0 && event.keyCode === 13) {
+    legendNameChg();
   }
 });
 
 //User Value Name Change
-valueButton.addEventListener("click", () => {
-  if (valueInputName.value.length > 0) {
-    myBarchart.options.valueName = valueInputName.value;
-    freshCanvas();
-    myBarchart.draw();
-    valueInputName.value = "";
-  }
-});
+valueButton.addEventListener("click", valueNameChg);
 
 valueInputName.addEventListener("keypress", (event) => {
-  if (valueInputName.value.length > 0 && event.keyCode === 13) {
-    myBarchart.options.valueName = valueInputName.value;
-    freshCanvas();
-    myBarchart.draw();
-    valueInputName.value = "";
+  if (elementLength(valueInputName) > 0 && event.keyCode === 13) {
+   valueNameChg();
   }
 });
 
@@ -333,7 +331,7 @@ valueInputName.addEventListener("keypress", (event) => {
 genNew.addEventListener("click", () => {
   let colors = [];
   for (let i = 0; i < myBarchart.colors.length; i++) {
-    let randomColor = "";
+    let randomColor = "";0
     do {
       randomColor = Math.floor(Math.random() * 16777215).toString(16);
     } while (randomColor.length < 6)
