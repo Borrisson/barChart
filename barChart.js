@@ -220,25 +220,21 @@ function freshCanvas() {
   let legend = document.getElementById("legend");
   legend.removeChild(legend.childNodes[0]);
 }
-class ListElementError extends Error {};
+class ListElementError extends Error { };
 
 
 function createListElement() {
   // /\d/.test checks wether or not there is a number in the string. It is a regular expression. between the two
   // forward slashes "//". \d is a type of expression, whereas .test() is a method. It is the same meaning as 
   // /[0-9]/.test(). It says check if there are any digits at all within this string. It will return a boolean. 
-  //next if checks wether the second string after ":", are digits otherwise it does nothing.
-  if (/:\s*\d/.test(userInput.value)) {
+  // next if checks wether the second string after ":", are digits otherwise it does nothing. List of other
+  // expressions can be found pg 147 of eloquent Javascript.
+  if (/.+:\s*\d/.test(userInput.value)) {
     let splitStr = userInput.value.split(":");
-    if (isNaN(splitStr[1])) {
-      alert("Enter only valid numbers, do not add any characters other than numbers after ':'.");
-      
-    } else {
-      dataSet[splitStr[0].trim()] = Number(splitStr[1]);
-      userInput.value = "";
-      freshCanvas();
-      myBarchart.draw();
-    }
+    dataSet[splitStr[0].trim()] = Number(splitStr[1]);
+    userInput.value = "";
+    freshCanvas();
+    myBarchart.draw();
   } else {
     alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
     throw new ListElementError("Invalid input: " + userInput.value);
@@ -249,7 +245,7 @@ function makeColorBox() {
   const divContainer = document.querySelector("div[class='container']");
   for (let i = 0; i < divContainer.childElementCount; i++) {
     if (divContainer.childElementCount < myBarchart.colors.length) {
-      let diff =  myBarchart.colors.length - divContainer.childElementCount;
+      let diff = myBarchart.colors.length - divContainer.childElementCount;
       while (diff > 0) {
         let index = myBarchart.colors.length - diff;
         let div = document.createElement('div');
@@ -274,9 +270,9 @@ function addNewElement() {
     myBarchart.colors.push(randomColor);
     try {
       createListElement();
-    } catch(e) {
+    } catch (e) {
       if (e instanceof ListElementError) {
-      myBarchart.colors.pop();
+        myBarchart.colors.pop();
       } else {
         throw e;
       }
@@ -289,9 +285,9 @@ function addNewElement() {
 //User input Data
 userButton.addEventListener("click", addNewElement);
 
-userInput.addEventListener("keypress", (event) => { 
+userInput.addEventListener("keypress", (event) => {
   if (inputLength() > 0 && event.keyCode === 13) {
-  addNewElement();
+    addNewElement();
   }
 });
 
@@ -365,76 +361,76 @@ slider.oninput = function () {
 
 //Drag and Drop items (working progress) functionality of drag and drop works. Trying to associate colors to boxes now.
 let dragAndDrop = (event) => {
-  
+
   let dragSrcEl;
-  
+
   function handleDragStart(e) {
     this.style.opacity = '0.4';
-    
+
     dragSrcEl = this;
-    
+
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', this.textContent);
-    
+
   }
-  
+
   function handleDragOver(e) {
     if (e.preventDefault) {
       e.preventDefault();
     }
-    
+
     e.dataTransfer.dropEffect = 'move';
-    
+
     return false;
   }
-  
+
   function handleDragEnter(e) {
     this.classList.add('over');
   }
-  
+
   function handleDragLeave(e) {
     this.classList.remove('over');
   }
-  
+
   function handleDrop(e) {
     if (e.stopPropagation) {
       e.stopPropagation(); // stops the browser from redirecting.
     }
-    
+
     if (dragSrcEl != this) {
       dragSrcEl.textContent = this.textContent;
       this.textContent = e.dataTransfer.getData('text/html');
-      
+
       idToReplace = this.attributes["color-id"].value;
       draggedId = dragSrcEl.attributes["color-id"].value;
-      bgColorToReplace = this.attributes['style'].value ;
+      bgColorToReplace = this.attributes['style'].value;
       draggedBgColor = dragSrcEl.attributes['style'].value;
       draggedBgColor = draggedBgColor.replace("opacity: 0.4", "");
-      
+
       this.setAttribute("style", draggedBgColor);
       dragSrcEl.setAttribute("style", bgColorToReplace);
-      
+
       let colorList = myBarchart.colors;
       let b = colorList[idToReplace];
       colorList[idToReplace] = colorList[draggedId];
       colorList[draggedId] = b;
-      
+
       freshCanvas();
       myBarchart.draw();
     }
-    
+
     return false;
   }
-  
+
   function handleDragEnd(e) {
     this.style.opacity = '1';
-    
+
     items.forEach(function (item) {
       item.classList.remove('over');
     });
   }
-  
-  
+
+
   let items = document.querySelectorAll('.container .box');
   items.forEach(function (item) {
     item.addEventListener('dragstart', handleDragStart, false);
@@ -444,23 +440,23 @@ let dragAndDrop = (event) => {
     item.addEventListener('drop', handleDrop, false);
     item.addEventListener('dragend', handleDragEnd, false);
   });
-  
+
 };
 
 
 const PICKER = {
   mouse_inside: false,
-  
+
   to_hex: function (dec) {
     hex = dec.toString(16);
     return hex.length == 2 ? hex : '0' + hex;
   },
-  
+
   show: function () {
     let input = $(this);
     let position = input.offset();
-    
-    PICKER.$colors  = $('<canvas width="230" height="150" ></canvas>');
+
+    PICKER.$colors = $('<canvas width="230" height="150" ></canvas>');
     PICKER.$colors.css({
       'position': 'absolute',
       'top': position.top + input.height() + 9,
@@ -470,74 +466,74 @@ const PICKER = {
     });
     $('body').append(PICKER.$colors.fadeIn());
     PICKER.colorctx = PICKER.$colors[0].getContext('2d');
-    
+
     PICKER.render();
-    
+
     PICKER.$colors
-    .click(function (e) {
-      let new_color = PICKER.get_color(e);
-      $(input).css({'background-color': new_color}).val(new_color).trigger('change').removeClass('color-picker-binded');
-      PICKER.close();
-      let i = $(input).index();
-      myBarchart.colors[i] = new_color;
-      freshCanvas();
-      myBarchart.draw();
-    })
-    .hover(function () {
-      PICKER.mouse_inside=true;
-    }, function () {
-      PICKER.mouse_inside=false;
-    });
-    
+      .click(function (e) {
+        let new_color = PICKER.get_color(e);
+        $(input).css({ 'background-color': new_color }).val(new_color).trigger('change').removeClass('color-picker-binded');
+        PICKER.close();
+        let i = $(input).index();
+        myBarchart.colors[i] = new_color;
+        freshCanvas();
+        myBarchart.draw();
+      })
+      .hover(function () {
+        PICKER.mouse_inside = true;
+      }, function () {
+        PICKER.mouse_inside = false;
+      });
+
     $("body").mouseup(function () {
       if (!PICKER.mouse_is_inside) PICKER.close();
     });
   },
-  
+
   bind_inputs: function () {
     $('div[draggable="true"]').each(function () {
       $(this).click(PICKER.show);
     }).addClass('color-picker-binded');
   },
-  
-  bind_input: function(index) {
+
+  bind_input: function (index) {
     $('div[draggable="true"]').eq(index).click(PICKER.show);
   },
-  
-  close: function () {PICKER.$colors.fadeOut(PICKER.$colors.remove);},
-  
+
+  close: function () { PICKER.$colors.fadeOut(PICKER.$colors.remove); },
+
   get_color: function (e) {
     let pos_x = e.pageX - PICKER.$colors.offset().left;
     let pos_y = e.pageY - PICKER.$colors.offset().top;
-    
+
     data = PICKER.colorctx.getImageData(pos_x, pos_y, 1, 1).data;
     return '#' + PICKER.to_hex(data[0]) + PICKER.to_hex(data[1]) + PICKER.to_hex(data[2]);
   },
-  
+
   // Build Color palette
   render: function () {
     let gradient = PICKER.colorctx.createLinearGradient(0, 0, PICKER.$colors.width(), 0);
-    
+
     // Create color gradient
-    gradient.addColorStop(0,    "rgb(255,   0,   0)");
+    gradient.addColorStop(0, "rgb(255,   0,   0)");
     gradient.addColorStop(0.15, "rgb(255,   0, 255)");
     gradient.addColorStop(0.33, "rgb(0,     0, 255)");
     gradient.addColorStop(0.49, "rgb(0,   255, 255)");
     gradient.addColorStop(0.67, "rgb(0,   255,   0)");
     gradient.addColorStop(0.84, "rgb(255, 255,   0)");
-    gradient.addColorStop(1,    "rgb(255,   0,   0)");
-    
+    gradient.addColorStop(1, "rgb(255,   0,   0)");
+
     // Apply gradient to canvas
     PICKER.colorctx.fillStyle = gradient;
     PICKER.colorctx.fillRect(0, 0, PICKER.colorctx.canvas.width, PICKER.colorctx.canvas.height);
-    
+
     // Create semi transparent gradient (white -> trans. -> black)
     gradient = PICKER.colorctx.createLinearGradient(0, 0, 0, PICKER.$colors.height());
-    gradient.addColorStop(0,   "rgba(255, 255, 255, 1)");
+    gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
     gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
     gradient.addColorStop(0.5, "rgba(0,     0,   0, 0)");
-    gradient.addColorStop(1,   "rgba(0,     0,   0, 1)");
-    
+    gradient.addColorStop(1, "rgba(0,     0,   0, 1)");
+
     // Apply gradient to canvas
     PICKER.colorctx.fillStyle = gradient;
     PICKER.colorctx.fillRect(0, 0, PICKER.colorctx.canvas.width, PICKER.colorctx.canvas.height);
