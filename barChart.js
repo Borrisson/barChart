@@ -220,15 +220,19 @@ function freshCanvas() {
   let legend = document.getElementById("legend");
   legend.removeChild(legend.childNodes[0]);
 }
+class ListElementError extends Error {};
+
 
 function createListElement() {
-  // /\d/.test checks wether or not there is a number in the string. No idea how it works will look into it further later. 
-  // from stackoverflow "Check whether an input string contains a number in javascript."
+  // /\d/.test checks wether or not there is a number in the string. It is a regular expression. between the two
+  // forward slashes "//". \d is a type of expression, whereas .test() is a method. It is the same meaning as 
+  // /[0-9]/.test(). It says check if there are any digits at all within this string. It will return a boolean. 
   //next if checks wether the second string after ":", are digits otherwise it does nothing.
-  if (userInput.value.indexOf(":") !== -1 && /\d/.test(userInput.value)) {
+  if (/:\s*\d/.test(userInput.value)) {
     let splitStr = userInput.value.split(":");
     if (isNaN(splitStr[1])) {
       alert("Enter only valid numbers, do not add any characters other than numbers after ':'.");
+      
     } else {
       dataSet[splitStr[0].trim()] = Number(splitStr[1]);
       userInput.value = "";
@@ -237,6 +241,7 @@ function createListElement() {
     }
   } else {
     alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
+    throw new ListElementError("Invalid input: " + userInput.value);
   }
 }
 
@@ -260,27 +265,33 @@ function makeColorBox() {
   }
   dragAndDrop();
 }
-
-
-
-//User input Data
-userButton.addEventListener("click", () => {
-  if (userInput.value.length > 0) {
+function inputLength() {
+  return userInput.value.length;
+}
+function addNewElement() {
+  if (inputLength() > 0) {
     let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
     myBarchart.colors.push(randomColor);
+    try {
+      createListElement();
+    } catch(e) {
+      if (e instanceof ListElementError) {
+      myBarchart.colors.pop();
+      } else {
+        throw e;
+      }
+    }
     makeColorBox();
-    createListElement();
     deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
   }
-});
+}
 
-userInput.addEventListener("keypress", (event) => {
-  if (userInput.value.length > 0 && event.keyCode === 13) {
-    let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    myBarchart.colors.push(randomColor);
-    makeColorBox();
-    createListElement();
-    deleteBtns[deleteBtns.length - 1].addEventListener("click", removeParent, false);
+//User input Data
+userButton.addEventListener("click", addNewElement);
+
+userInput.addEventListener("keypress", (event) => { 
+  if (inputLength() > 0 && event.keyCode === 13) {
+  addNewElement();
   }
 });
 
@@ -355,7 +366,7 @@ slider.oninput = function () {
 //Drag and Drop items (working progress) functionality of drag and drop works. Trying to associate colors to boxes now.
 let dragAndDrop = (event) => {
   
-  var dragSrcEl = null;
+  let dragSrcEl;
   
   function handleDragStart(e) {
     this.style.opacity = '0.4';
@@ -363,7 +374,7 @@ let dragAndDrop = (event) => {
     dragSrcEl = this;
     
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', this.innerHTML);
+    e.dataTransfer.setData('text/html', this.textContent);
     
   }
   
@@ -391,8 +402,8 @@ let dragAndDrop = (event) => {
     }
     
     if (dragSrcEl != this) {
-      dragSrcEl.innerHTML = this.innerHTML;
-      this.innerHTML = e.dataTransfer.getData('text/html');
+      dragSrcEl.textContent = this.textContent;
+      this.textContent = e.dataTransfer.getData('text/html');
       
       idToReplace = this.attributes["color-id"].value;
       draggedId = dragSrcEl.attributes["color-id"].value;
@@ -437,7 +448,7 @@ let dragAndDrop = (event) => {
 };
 
 
-PICKER = {
+const PICKER = {
   mouse_inside: false,
   
   to_hex: function (dec) {
