@@ -17,6 +17,8 @@ const valueButton = document.getElementById("value-input-enter");
 const genNew = document.getElementById("genNew");
 const slider = document.getElementById("slider");
 const dropDown = document.getElementById("bar-value-position");
+const userInputAlert = document.getElementById("user-input-alert");
+const dragger = document.getElementsByClassName("box color-picker-binded");
 
 let dataSet = {
   "Classical music": 10,
@@ -176,14 +178,18 @@ let myBarchart = new Barchart(
 
 myBarchart.draw();
 
+//delete button will remove color from array and make sure the div elements containing the draggable colors will reset accordingly and delete the corresponding one. 
 
 function removeParent() {
   this.removeEventListener("click", removeParent, false);
   const index = Object.keys(dataSet).indexOf(this.id);
-  $('div[draggable="true"').eq(index).remove();
   delete dataSet[this.id];
   myBarchart.colors.splice(index, 1);
   this.parentNode.remove();
+  $('div[draggable="true"]').eq(index).remove();
+  for(let index of myBarchart.colors.keys()) {
+    dragger[index].setAttribute("color-id", index);
+  }
   freshCanvas();
   myBarchart.draw();
 }
@@ -201,7 +207,7 @@ function removeParent(evt) {
 function defaultListElement(index, input, color) {
   let li = document.createElement("li");
   let btns = document.createElement("button");
-  btns.className = 'delete';
+  btns.className = 'delete btn btn-danger';
   btns.textContent = 'delete';
   li.style.listStyle = "none";
   if (color === "transparent") {
@@ -228,15 +234,18 @@ function createListElement() {
   // /\d/.test checks wether or not there is a number in the string. It is a regular expression. between the two
   // forward slashes "//". \d is a type of expression, whereas .test() is a method. It is the same meaning as 
   // /[0-9]/.test(). It says check if there are any digits at all within this string. It will return a boolean. 
-  //  List of other expressions can be found pg 147 of eloquent Javascript.
+  //  List of other expressions can be found pg 147 of Eloquent Javascript.
   if (/.+:\s*\d/.test(userInput.value)) {
     let splitStr = userInput.value.split(":");
     dataSet[splitStr[0].trim()] = Number(splitStr[1]);
     userInput.value = "";
+    userInputAlert.className = "";
+    userInputAlert.textContent = "";
     freshCanvas();
     myBarchart.draw();
   } else {
-    alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
+    userInputAlert.className = "alert alert-warning";
+    userInputAlert.textContent = "Don't forget to write in this format <data:value>"
     throw new ListElementError(console.log("Invalid input: " + userInput.value));
   }
 }
@@ -336,7 +345,7 @@ valueInputName.addEventListener("keypress", (event) => {
 genNew.addEventListener("click", () => {
   let colors = [];
   for (let i = 0; i < myBarchart.colors.length; i++) {
-    let randomColor = "";0
+    let randomColor = "";
     do {
       randomColor = Math.floor(Math.random() * 16777215).toString(16);
     } while (randomColor.length < 6)
@@ -417,7 +426,7 @@ let dragAndDrop = (event) => {
       let b = colorList[idToReplace];
       colorList[idToReplace] = colorList[draggedId];
       colorList[draggedId] = b;
-
+      
       freshCanvas();
       myBarchart.draw();
     }
