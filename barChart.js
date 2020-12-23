@@ -237,7 +237,7 @@ function createListElement() {
     myBarchart.draw();
   } else {
     alert("Don't forget to write in this format <data:value> without :<> and make sure data is 'alphabetic' and value numberic.")
-    throw new ListElementError("Invalid input: " + userInput.value);
+    throw new ListElementError(console.log("Invalid input: " + userInput.value));
   }
 }
 
@@ -261,9 +261,14 @@ function makeColorBox() {
   }
   dragAndDrop();
 }
+
+//returns length of string from userInput fields
 function elementLength(targetedElement) {
   return targetedElement.value.length;
 }
+
+//does many things here, first creates a new color, next it tries to create a list element(bar, legend and delete button)
+// if the input was incorrect it will delete the color that it created. Need the color first in order to make the bar.
 function addNewElement() {
   if (elementLength(userInput) > 0) {
     let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
