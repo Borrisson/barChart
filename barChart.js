@@ -251,7 +251,7 @@ function createListElement() {
 }
 
 function makeColorBox() {
-  const divContainer = document.querySelector("div[class='container']");
+  const divContainer = document.querySelector("div[id='bgColorSequence']");
   for (let i = 0; i < divContainer.childElementCount; i++) {
     if (divContainer.childElementCount < myBarchart.colors.length) {
       let diff = myBarchart.colors.length - divContainer.childElementCount;
@@ -351,6 +351,7 @@ genNew.addEventListener("click", () => {
     } while (randomColor.length < 6)
     colors.push("#" + randomColor);
   }
+
   myBarchart.colors = colors;
   makeColorBox();
   freshCanvas();
