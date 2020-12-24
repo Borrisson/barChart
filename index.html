@@ -10,28 +10,36 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-  <div id="bgColorSequence" class="container">
-    <div color-id="0" draggable="true" class="box"></div>
-    <div color-id="1" draggable="true" class="box"></div>
-    <div color-id="2" draggable="true" class="box"></div>
-    <div color-id="3" draggable="true" class="box"></div>
-  </div>
-  <h1>
-    <button type="button" class="btn btn-primary" id="genNew">Generate New Random Color</button>
-    <span id="color"></span>
-  </h1>
-  <div class="slidecontainer">
-    <input id="slider" type="range" min="5" max="250" value="5" class="slider" step="5" id="myRange"> <span>Grid Line range</span>
-  </div>
 
+<body>
   <div class="container">
-    <div class="form-floating mb-3 col-sm-4">
-      <input id="user-input" type="text" class="form-control" placeholder="Enter [data : value] format.">
-      <label for="user-input">Enter [data : value] format.</label>
+    <div id="bgColorSequence" class="row">
+      <div color-id="0" draggable="true" class="box"></div>
+      <div color-id="1" draggable="true" class="box"></div>
+      <div color-id="2" draggable="true" class="box"></div>
+      <div color-id="3" draggable="true" class="box"></div>
     </div>
-    <button type="button" id="user-input-enter" class="btn btn-primary col-sm-1">Enter</button>
-    <div id="user-input-alert" class="col-sm-2" role="alert"></div>
+  </div>
+  <div class="container">
+    <h1>
+      <button type="button" class="btn btn-primary" id="genNew">Generate New Random Color</button>
+    </h1>
+  </div>
+  <div class="container">
+    <div class="slidecontainer">
+      <input id="slider" type="range" min="5" max="250" value="5" class="slider" step="5" id="myRange">
+      <span>Grid Line Rane</span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="form-floating mb-3 col-sm-4">
+        <input id="user-input" type="text" class="form-control" placeholder="Enter [data : value] format.">
+        <label for="user-input">Enter [data : value] format.</label>
+      </div>
+      <button type="button" id="user-input-enter" class="btn btn-primary col-sm-1">Enter</button>
+      <div id="user-input-alert" class="col-sm-2" role="alert"></div>
+    </div>
   </div>
   <br>
 
