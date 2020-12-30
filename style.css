@@ -1,3 +1,12 @@
+.container {
+padding: 10px, 5px, 10px, 5px;
+border: 20px, 20px;
+}
+
+div button {
+  display: inline-flex;
+  justify-content: flex-start;
+}
 #bgColorSequence {
   justify-content: flex-start;
   flex-direction: row;

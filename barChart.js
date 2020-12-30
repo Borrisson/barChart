@@ -178,7 +178,7 @@ let myBarchart = new Barchart(
 
 myBarchart.draw();
 
-//delete button will remove color from array and make sure the div elements containing the draggable colors will reset accordingly and delete the corresponding one. 
+//delete button will remove color from array and make sure the span elements containing the draggable colors will reset accordingly and delete the corresponding one. 
 
 function removeParent() {
   this.removeEventListener("click", removeParent, false);
@@ -186,7 +186,7 @@ function removeParent() {
   delete dataSet[this.id];
   myBarchart.colors.splice(index, 1);
   this.parentNode.remove();
-  $('div[draggable="true"]').eq(index).remove();
+  $('span[draggable="true"]').eq(index).remove();
   for(let index of myBarchart.colors.keys()) {
     dragger[index].setAttribute("color-id", index);
   }
@@ -245,28 +245,28 @@ function createListElement() {
     myBarchart.draw();
   } else {
     userInputAlert.className = "alert alert-warning";
-    userInputAlert.textContent = "Don't forget to write in this format <data:value>"
+    userInputAlert.textContent = "Don't forget to write in this format <data:value>";
     throw new ListElementError(console.log("Invalid input: " + userInput.value));
   }
 }
 
 function makeColorBox() {
-  const divContainer = document.querySelector("div[id='bgColorSequence']");
-  for (let i = 0; i < divContainer.childElementCount; i++) {
-    if (divContainer.childElementCount < myBarchart.colors.length) {
-      let diff = myBarchart.colors.length - divContainer.childElementCount;
+  const spanContainer = document.querySelector("span[id='bgColorSequence']");
+  for (let i = 0; i < spanContainer.childElementCount; i++) {
+    if (spanContainer.childElementCount < myBarchart.colors.length) {
+      let diff = myBarchart.colors.length - spanContainer.childElementCount;
       while (diff > 0) {
         let index = myBarchart.colors.length - diff;
-        let div = document.createElement('div');
-        div.setAttribute("color-id", index);
-        div.setAttribute('draggable', "true");
-        div.setAttribute("class", "box color-picker-binded");
-        divContainer.appendChild(div);
+        let span = document.createElement('span');
+        span.setAttribute("color-id", index);
+        span.setAttribute('draggable', "true");
+        span.setAttribute("class", "box color-picker-binded");
+        spanContainer.appendChild(span);
         diff--;
         PICKER.bind_input(index);
       }
     }
-    divContainer.children[i].style.backgroundColor = myBarchart.colors[i];
+    spanContainer.children[i].style.backgroundColor = myBarchart.colors[i];
   }
   dragAndDrop();
 }
@@ -504,13 +504,13 @@ const PICKER = {
   },
 
   bind_inputs: function () {
-    $('div[draggable="true"]').each(function () {
+    $('span[draggable="true"]').each(function () {
       $(this).click(PICKER.show);
     }).addClass('color-picker-binded');
   },
 
   bind_input: function (index) {
-    $('div[draggable="true"]').eq(index).click(PICKER.show);
+    $('span[draggable="true"]').eq(index).click(PICKER.show);
   },
 
   close: function () { PICKER.$colors.fadeOut(PICKER.$colors.remove); },

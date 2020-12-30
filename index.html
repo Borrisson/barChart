@@ -13,17 +13,17 @@
 
 <body>
   <div class="container">
-    <div id="bgColorSequence" class="row">
-      <div color-id="0" draggable="true" class="box"></div>
-      <div color-id="1" draggable="true" class="box"></div>
-      <div color-id="2" draggable="true" class="box"></div>
-      <div color-id="3" draggable="true" class="box"></div>
-    </div>
+    <span id="bgColorSequence" class="row">
+      <span color-id="0" draggable="true" class="box"></span>
+      <span color-id="1" draggable="true" class="box"></span>
+      <span color-id="2" draggable="true" class="box"></span>
+      <span color-id="3" draggable="true" class="box"></span>
+    </span>
   </div>
   <div class="container">
-    <h1>
+    <span class="row">
       <button type="button" class="btn btn-primary" id="genNew">Generate New Random Color</button>
-    </h1>
+    </span>
   </div>
   <div class="container">
     <div class="slidecontainer">
@@ -32,36 +32,37 @@
     </div>
   </div>
   <div class="container">
-    <div class="row">
-      <div class="form-floating mb-3 col-sm-4">
+    <span class="row">
+      <span id="user-input-alert" class="mb-3" role="alert"></span>
+      <span class="form-floating mb-3 col-sm-6">
         <input id="user-input" type="text" class="form-control" placeholder="Enter [data : value] format.">
         <label for="user-input">Enter [data : value] format.</label>
-      </div>
-      <button type="button" id="user-input-enter" class="btn btn-primary col-sm-1">Enter</button>
-      <div id="user-input-alert" class="col-sm-2" role="alert"></div>
-    </div>
+        <button type="button" id="user-input-enter" class="btn btn-primary col-sm-3">Enter</button>
+      </span>
+    </span>
   </div>
   <br>
   <div class="container">
     <input id="legend-input" type="text" placeholder="Enter legend Name">
-    <button type="button" id="legend-input-enter" class="btn btn-primary col-sm-1">Enter</button>
+    <button type="button" id="legend-input-enter" class="btn btn-primary">Enter</button>
     <br>
-
     <input id="value-input" type="text" placeholder="Enter value Name">
-    <button type="button" id="value-input-enter" class="btn btn-primary col-sm-1">Enter</button>
+    <button type="button" id="value-input-enter" class="btn btn-primary">Enter</button>
   </div>
   <br>
-  <label for="bar-Value">Choose the position of the value:</label>
-
-  <select id="bar-value-position">
-    <option value="top">Top</option>
-    <option value="center">Center</option>
-    <option value="bottom">Bottom</option>
-  </select>
-  <br>a
-
-  <canvas id="myCanvas">If you do not see any chart. Try enabling javascript from your broswer settings.</canvas>
-  <legend id="legend" for="myCanvas"></legend>
+  <div class="container">
+    <label for="bar-Value">Choose the position of the value:</label>
+    <select id="bar-value-position">
+      <option value="top">Top</option>
+      <option value="center">Center</option>
+      <option value="bottom">Bottom</option>
+    </select>
+  </div>
+  <br>
+  <div class="container">
+    <canvas id="myCanvas">If you do not see any chart. Try enabling javascript from your broswer settings.</canvas>
+    <legend id="legend" for="myCanvas"></legend>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
     crossorigin="anonymous"></script>
