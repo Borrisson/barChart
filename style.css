@@ -1,11 +1,13 @@
 .container {
-padding: 10px, 5px, 10px, 5px;
-border: 20px, 20px;
+  height: 50px;
+  width: auto;
+}
+.row {
+  display: flex;
 }
 
-div button {
-  display: inline-flex;
-  justify-content: flex-start;
+button {
+  border-radius: 1em;
 }
 #bgColorSequence {
   justify-content: flex-start;
@@ -19,7 +21,7 @@ div button {
 .box {
   border: 3px solid #666;
   border-radius: .5em;
-  padding: 10px;
+  padding: 8px, 8px;
   cursor: move;
 }
 

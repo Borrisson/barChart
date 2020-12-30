@@ -12,7 +12,7 @@
 
 
 <body>
-  <div class="container">
+  <div class="container p-4">
     <span id="bgColorSequence" class="row">
       <span color-id="0" draggable="true" class="box"></span>
       <span color-id="1" draggable="true" class="box"></span>
@@ -20,29 +20,29 @@
       <span color-id="3" draggable="true" class="box"></span>
     </span>
   </div>
-  <div class="container">
+  <div class="container pt-3">
     <span class="row">
-      <button type="button" class="btn btn-primary" id="genNew">Generate New Random Color</button>
+      <button type="button" class="btn btn-primary col-sm-3" id="genNew">Generate New Random Color</button>
     </span>
   </div>
-  <div class="container">
+  <div class="container pt-3">
     <div class="slidecontainer">
       <input id="slider" type="range" min="5" max="250" value="5" class="slider" step="5" id="myRange">
-      <span>Grid Line Rane</span>
+      <span>Grid Line Range</span>
     </div>
   </div>
   <div class="container">
     <span class="row">
-      <span id="user-input-alert" class="mb-3" role="alert"></span>
-      <span class="form-floating mb-3 col-sm-6">
+      <span id="user-input-alert" class="m-1" role="alert"></span>
+      <span class="form-floating col-sm-3">
         <input id="user-input" type="text" class="form-control" placeholder="Enter [data : value] format.">
-        <label for="user-input">Enter [data : value] format.</label>
-        <button type="button" id="user-input-enter" class="btn btn-primary col-sm-3">Enter</button>
+        <label for="user-input" class="">Enter [data : value] format.</label>
       </span>
+      <button type="button" id="user-input-enter" class="btn btn-primary col-sm-3">Enter</button>
     </span>
   </div>
   <br>
-  <div class="container">
+  <div class="container my-5">
     <input id="legend-input" type="text" placeholder="Enter legend Name">
     <button type="button" id="legend-input-enter" class="btn btn-primary">Enter</button>
     <br>
